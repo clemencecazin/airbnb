@@ -7,6 +7,7 @@ import {
     Image,
     ScrollView,
     ActivityIndicator,
+    StyleSheet,
 } from "react-native";
 import { useState, useEffect } from "react";
 
@@ -34,10 +35,16 @@ export default function RoomScreen({ route }) {
     }, []);
 
     return (
-        <ScrollView>
+        <ScrollView style={styles.container}>
             <View>
                 <Text>{data.description}</Text>
             </View>
         </ScrollView>
     );
 }
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "white",
+        flex: 1,
+    },
+});

@@ -11,11 +11,36 @@ import {
 } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { useState, useEffect } from "react";
+import { Entypo } from "@expo/vector-icons";
+
 const axios = require("axios");
 
 export default function HomeScreen({ navigation }) {
     const [data, setData] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+
+    const displayStars = (ratingValue) => {
+        const tab = [];
+
+        for (let i = 1; i <= 5; i++) {
+            if (ratingValue >= i) {
+                tab.push(
+                    <Entypo name="star" size={24} color="#f4b33f" key={i} />
+                );
+            } else {
+                tab.push(
+                    <Entypo
+                        name="star-outlined"
+                        size={24}
+                        color="#f4b33f"
+                        key={i}
+                    />
+                );
+            }
+        }
+
+        return tab;
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -77,7 +102,9 @@ export default function HomeScreen({ navigation }) {
                                             {item.title}
                                         </Text>
                                         <View style={styles.rating}>
-                                            <Text>{item.ratingValue}</Text>
+                                            <Text style={styles.stars}>
+                                                {displayStars(item.ratingValue)}
+                                            </Text>
                                             <Text style={styles.reviews}>
                                                 {item.reviews} reviews
                                             </Text>
@@ -105,12 +132,12 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     containers: {
-        borderBottomColor: "lightgrey",
-        borderBottomWidth: 1,
-        paddingHorizontal: 30,
+        borderBottomColor: "#f6f5f5",
+        borderBottomWidth: 0.2,
         alignItems: "center",
         borderBottomColor: "grey",
         marginVertical: 10,
+        marginHorizontal: 30,
     },
     photo: {
         position: "relative",
@@ -129,7 +156,6 @@ const styles = StyleSheet.create({
     details: {
         flexDirection: "row",
         height: 100,
-        padding: 10,
         justifyContent: "space-between",
         marginTop: 10,
         alignItems: "center",
@@ -149,6 +175,8 @@ const styles = StyleSheet.create({
     },
     reviews: {
         color: "grey",
+        paddingVertical: 5,
+        paddingLeft: 5,
     },
     title: {
         fontSize: 18,

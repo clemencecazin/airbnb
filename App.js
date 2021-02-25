@@ -63,26 +63,15 @@ export default function App() {
                 </Stack.Navigator>
             ) : (
                 // User is signed in
-                <Stack.Navigator
-                // screenOptions={{
-                //     headerBackTitleVisible: false,
-                //     headerTintColor: "#fff",
-                //     headerTitle: <Logo size="small"></Logo>,
-                // }}
-                >
+                <Stack.Navigator>
                     <Stack.Screen
                         name="Tab"
                         options={{
-                            headerStyle: {
-                                backgroundColor: "##fff",
-                            },
-                            headerBackTitleVisible: false,
-
-                            headerTintColor: "#fff",
+                            headerShown: false,
+                            animationEnabled: false,
                         }}
                     >
                         {() => (
-                            // Navigation du bas
                             <Tab.Navigator
                                 tabBarOptions={{
                                     activeTintColor: "tomato",
@@ -90,7 +79,6 @@ export default function App() {
                                 }}
                             >
                                 <Tab.Screen
-                                    token={userToken}
                                     name="Home"
                                     options={{
                                         tabBarLabel: "Home",

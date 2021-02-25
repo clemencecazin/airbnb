@@ -5,12 +5,12 @@ import * as Location from "expo-location";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 const axios = require("axios");
 
-export default function SettingsScreen() {
+export default function AroundMeScreen() {
     const [error, setError] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [coords, setCoords] = useState();
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
     const [data, setData] = useState("");
 
     useEffect(() => {
@@ -20,29 +20,32 @@ export default function SettingsScreen() {
             // Demande d'autorisation d'accès à la localisation de l'appareil
             const { status } = await Location.requestPermissionsAsync();
             console.log(status);
+            try {
+                if (status === "granted") {
+                    console.log("Permission acceptée");
 
-            if (status === "granted") {
-                console.log("Permission acceptée");
+                    // Obtenir les coordonnées GPS
+                    const location = await Location.getCurrentPositionAsync();
+                    // console.log(location);
+                    setLatitude(location.coords.latitude);
+                    setLongitude(location.coords.longitude);
 
-                // Obtenir les coordonnées GPS
-                const location = await Location.getCurrentPositionAsync();
-                // console.log(location);
-                setLatitude(location.coords.latitude);
-                setLongitude(location.coords.longitude);
+                    const response = await axios.get(
+                        `https://express-airbnb-api.herokuapp.com/rooms/around`
+                    );
+                    console.log(response.data);
 
-                setIsLoading(false);
-            } else {
-                console.log("Permission refusée");
-                setError(true);
+                    setData(response.data);
+
+                    // console.log(data);
+                    setIsLoading(false);
+                } else {
+                    console.log("Permission refusée");
+                    setError(true);
+                }
+            } catch (error) {
+                console.log(error.response);
             }
-
-            const response = await axios.get(
-                `https://express-airbnb-api.herokuapp.com/rooms/around/`
-            );
-            // console.log(response.data);
-
-            setData(response.data);
-            // console.log(data);
         };
 
         askPermissionAndGetLocation();
@@ -66,14 +69,14 @@ export default function SettingsScreen() {
                 showsUserLocation={true}
             >
                 {data.map((item, index) => {
-                    // console.log(item);
+                    console.log(item.location);
                     return (
                         <MapView.Marker
+                            key={index}
                             coordinate={{
                                 latitude: item.location[1],
                                 longitude: item.location[0],
                             }}
-                            key={index}
                         />
                     );
                 })}
