@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Button, Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 const axios = require("axios");
@@ -19,31 +19,41 @@ export default function AroundMeScreen() {
 
             // Demande d'autorisation d'accès à la localisation de l'appareil
             const { status } = await Location.requestPermissionsAsync();
-            console.log(status);
+            console.log(status); // granted or denied
             try {
                 if (status === "granted") {
-                    console.log("Permission acceptée");
+                    // console.log("Permission acceptée");
 
                     // Obtenir les coordonnées GPS
                     const location = await Location.getCurrentPositionAsync();
                     // console.log(location);
+
+                    // On stock les coords dans un state latitude et longitude pour ensuite utiliser ces données afin de centrer la MapView sur la positiob de l'utilisateur
+                    // C'est asynchrone alors les states ne sont pas à jour tout de suite
                     setLatitude(location.coords.latitude);
                     setLongitude(location.coords.longitude);
 
+                    // En query on passe le chemin de latitude et longitude car state ne sont pas à jour
+                    // On cherche les rooms proche de la localisation de l'utilisateur
+                    const response = await axios.get(
+                        `https://express-airbnb-api.herokuapp.com/rooms/around?latitude=${location.coords.latitude}&longitude=${location.coords.longitude}`
+                    );
+                    // console.log(response.data);
+
+                    setData(response.data);
+
+                    // console.log(data);
+                } else {
                     const response = await axios.get(
                         `https://express-airbnb-api.herokuapp.com/rooms/around`
                     );
                     console.log(response.data);
 
-                    setData(response.data);
-
-                    // console.log(data);
-                    setIsLoading(false);
-                } else {
                     console.log("Permission refusée");
-                    setError(true);
                 }
+                setIsLoading(false);
             } catch (error) {
+                alert("An error occurred");
                 console.log(error.response);
             }
         };
@@ -52,24 +62,22 @@ export default function AroundMeScreen() {
     }, []);
 
     return isLoading ? ( // step 1
-        <Text>Chargement...</Text> // step 2
-    ) : error ? ( // step 3
-        <Text>Permission refusée</Text> // step 4
+        <ActivityIndicator size="large" color="tomato" /> // step 2
     ) : (
         <View>
             <MapView
                 style={styles.mapView}
                 provider={PROVIDER_GOOGLE}
                 initialRegion={{
-                    latitude: 48.856614,
-                    longitude: 2.3522219,
+                    latitude: latitude,
+                    longitude: longitude,
                     latitudeDelta: 0.1,
                     longitudeDelta: 0.1,
                 }}
                 showsUserLocation={true}
             >
                 {data.map((item, index) => {
-                    console.log(item.location);
+                    // console.log(item.location);
                     return (
                         <MapView.Marker
                             key={index}
@@ -93,9 +101,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     mapView: {
-        // height: height,
-        // width: width,
-        height: 500,
+        height: "100%",
         width: "100%",
     },
 });

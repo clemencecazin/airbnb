@@ -21,7 +21,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 const axios = require("axios");
 
-export default function SignInScreen({ setToken }) {
+export default function SignInScreen({ setToken, setId }) {
     const navigation = useNavigation();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -37,12 +37,17 @@ export default function SignInScreen({ setToken }) {
                         password: password,
                     }
                 );
+                // console.log(response.data);
+                // console.log(response.data.id);
 
                 if (response.status === 200) {
                     const userToken = response.data.token;
+                    const userId = response.data.id;
                     // console.log(userToken);
+
                     alert("Success");
                     setToken(userToken);
+                    setId(userId);
                 }
             } else {
                 setErrorMessage("Please fill all fields");
@@ -78,14 +83,14 @@ export default function SignInScreen({ setToken }) {
 
                         {/* <Text>{confirmedPassword}</Text> */}
                         <ConnectionButton
-                            text="Sign UP"
+                            text="Sign IN"
                             submitFunction={loginSubmit}
                         />
 
                         <Text>{errorMessage}</Text>
 
                         <RedirectButton
-                            text="Aller sur écran sign in"
+                            text="Aller sur écran sign up"
                             screen="SignUp"
                         />
 

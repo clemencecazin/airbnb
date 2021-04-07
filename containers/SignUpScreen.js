@@ -23,7 +23,7 @@ import ConnectionButton from "../components/ConnectionButton";
 import RedirectButton from "../components/RedirectButton";
 const axios = require("axios");
 
-export default function SignUpScreen({ setToken }) {
+export default function SignUpScreen({ setToken, setId }) {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [description, setDescription] = useState("");
@@ -49,10 +49,16 @@ export default function SignUpScreen({ setToken }) {
 
                     if (response.status === 200) {
                         const userToken = response.data.token;
+                        const userId = response.data.id;
+                        // console.log(userToken);
+                        // console.log(userId);
+
+                        // console.log(response.data.id);
                         alert("Success");
                         setToken(userToken);
+                        setId(userId);
                     } else {
-                        setErroMessage("An error occurred");
+                        setErrorMessage("An error occurred");
                     }
                 } catch (error) {
                     console.log(error.response.data.error);
@@ -60,15 +66,15 @@ export default function SignUpScreen({ setToken }) {
                     const message = error.response.data.error;
 
                     if (message === "This email already has an account.") {
-                        setErroMessage(message);
+                        setErrorMessage(message);
                     } else if (
                         message === "This username already has an account."
                     ) {
-                        setErroMessage(message);
+                        setErrorMessage(message);
                     }
                 }
             } else {
-                setErroMessage("Les 2 MDP doivent etre identiques");
+                setErrorMessage("Les 2 MDP doivent etre identiques");
             }
         } else {
             setErrorMessage("Tous les champs doivent être remplis");

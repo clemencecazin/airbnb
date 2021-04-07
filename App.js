@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import HomeScreen from "./containers/HomeScreen";
 import RoomScreen from "./containers/RoomScreen";
 import ProfileScreen from "./containers/ProfileScreen";
@@ -17,9 +18,10 @@ import Logo from "./components/Logo";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-export default function App() {
+export default function App({ navigation }) {
     const [isLoading, setIsLoading] = useState(true);
     const [userToken, setUserToken] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     const setToken = async (token) => {
         if (token) {
@@ -31,16 +33,30 @@ export default function App() {
         setUserToken(token);
     };
 
+    const setId = async (id) => {
+        if (id) {
+            AsyncStorage.setItem("userId", id);
+        } else {
+            AsyncStorage.removeItem("userId");
+        }
+
+        setUserId(id);
+    };
+
     useEffect(() => {
         // Fetch the token from storage then navigate to our appropriate place
         const bootstrapAsync = async () => {
             // We should also handle error for production apps
             const userToken = await AsyncStorage.getItem("userToken");
+            const userId = await AsyncStorage.getItem("userId");
 
             // This will switch to the App screen or Auth screen and this loading
             // screen will be unmounted and thrown away.
             setIsLoading(false);
             setUserToken(userToken);
+            setUserId(userId);
+            // console.log(userToken);
+            // console.log(userId);
         };
 
         bootstrapAsync();
@@ -55,10 +71,14 @@ export default function App() {
                         name="SignIn"
                         options={{ animationEnabled: false }}
                     >
-                        {() => <SignInScreen setToken={setToken} />}
+                        {() => (
+                            <SignInScreen setToken={setToken} setId={setId} />
+                        )}
                     </Stack.Screen>
                     <Stack.Screen name="SignUp">
-                        {() => <SignUpScreen setToken={setToken} />}
+                        {() => (
+                            <SignUpScreen setToken={setToken} setId={setId} />
+                        )}
                     </Stack.Screen>
                 </Stack.Navigator>
             ) : (
@@ -101,15 +121,11 @@ export default function App() {
                                         >
                                             <Stack.Screen
                                                 name="Home"
-                                                // options={{
-                                                //     title: "My App",
-                                                //     headerStyle: {
-                                                //         backgroundColor: "red",
-                                                //     },
-                                                //     headerTitleStyle: {
-                                                //         color: "white",
-                                                //     },
-                                                // }}
+                                                options={{
+                                                    headerTitle: () => (
+                                                        <Logo size="small" />
+                                                    ),
+                                                }}
                                             >
                                                 {(props) => (
                                                     <HomeScreen {...props} />
@@ -127,7 +143,15 @@ export default function App() {
                                                 )}
                                             </Stack.Screen> */}
 
-                                            <Stack.Screen name="Room">
+                                            <Stack.Screen
+                                                name="Room"
+                                                options={{
+                                                    headerTitle: () => (
+                                                        <Logo size="small" />
+                                                    ),
+                                                    headerBackTitleVisible: false,
+                                                }}
+                                            >
                                                 {(props) => (
                                                     <RoomScreen {...props} />
                                                 )}
@@ -156,6 +180,9 @@ export default function App() {
                                                 options={{
                                                     title: "Around me",
                                                     tabBarLabel: "Around me",
+                                                    headerTitle: () => (
+                                                        <Logo size="small" />
+                                                    ),
                                                 }}
                                             >
                                                 {() => <AroundMeScreen />}
@@ -163,7 +190,47 @@ export default function App() {
                                         </Stack.Navigator>
                                     )}
                                 </Tab.Screen>
+
                                 <Tab.Screen
+                                    name="myProfile"
+                                    options={{
+                                        tabBarLabel: "my Profile",
+                                        tabBarIcon: ({ color, size }) => (
+                                            <AntDesign
+                                                name="user"
+                                                size={24}
+                                                color={color}
+                                            />
+                                        ),
+                                    }}
+                                >
+                                    {() => (
+                                        <Stack.Navigator>
+                                            <Stack.Screen
+                                                name="myProfile"
+                                                options={{
+                                                    title: "my Profile",
+                                                    tabBarLabel: "my Profile",
+
+                                                    headerTitle: () => (
+                                                        <Logo size="small" />
+                                                    ),
+                                                }}
+                                            >
+                                                {(props) => (
+                                                    <ProfileScreen
+                                                        {...props}
+                                                        setToken={setToken}
+                                                        setId={setId}
+                                                        userId={userId}
+                                                        userToken={userToken}
+                                                    />
+                                                )}
+                                            </Stack.Screen>
+                                        </Stack.Navigator>
+                                    )}
+                                </Tab.Screen>
+                                {/* <Tab.Screen
                                     name="Settings"
                                     options={{
                                         tabBarLabel: "Settings",
@@ -193,7 +260,7 @@ export default function App() {
                                             </Stack.Screen>
                                         </Stack.Navigator>
                                     )}
-                                </Tab.Screen>
+                                </Tab.Screen> */}
                             </Tab.Navigator>
                         )}
                     </Stack.Screen>

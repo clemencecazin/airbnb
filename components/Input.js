@@ -1,27 +1,56 @@
 import React from "react";
-import { TextInput, StyleSheet } from "react-native";
+import { StyleSheet, TextInput } from "react-native";
 
-const Input = ({ placeholder, setFunction, secure }) => {
-    return (
-        <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            onChangeText={(text) => {
-                setFunction(text);
-            }}
-            secureTextEntry={secure ? true : false}
-        />
-    );
-};
+import colors from "../assets/colors";
+
+function Input({
+  setFunction,
+  keyboardType,
+  secureTextEntry,
+  placeholder,
+  value,
+  setNewInformations,
+  setDisplayMessage,
+  setIsInfosModified,
+}) {
+  return (
+    <TextInput
+      style={styles.textInput}
+      keyboardType={keyboardType ? keyboardType : "default"}
+      secureTextEntry={secureTextEntry ? true : false}
+      placeholder={placeholder}
+      autoCapitalize="none"
+      textContentType="none"
+      value={value && value}
+      onChangeText={(text) => {
+        setFunction(text);
+        if (setNewInformations) {
+          setNewInformations(true);
+        }
+        if (setDisplayMessage) {
+          setDisplayMessage(false);
+        }
+        if (setIsInfosModified) {
+          setIsInfosModified(true);
+        }
+      }}
+    />
+  );
+}
 
 export default Input;
 
 const styles = StyleSheet.create({
-    input: {
-        fontSize: 20,
-        borderBottomColor: "grey",
-        borderBottomWidth: 3,
-        marginTop: 30,
-        height: 40,
-    },
+  center: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textInput: {
+    height: 40,
+    borderBottomColor: colors.lightPink,
+    borderBottomWidth: 2,
+    width: "80%",
+    marginBottom: 30,
+    fontSize: 16,
+  },
 });

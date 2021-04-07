@@ -1,16 +1,21 @@
 import React from "react";
-import { Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    TouchableHighlight,
+} from "react-native";
 
 const ConnectionButton = ({ text, submitFunction }) => {
     return (
-        <TouchableOpacity
+        <TouchableHighlight
             style={styles.btn}
             onPress={() => {
                 submitFunction();
             }}
         >
             <Text style={styles.text}>{text}</Text>
-        </TouchableOpacity>
+        </TouchableHighlight>
     );
 };
 
